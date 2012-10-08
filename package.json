@@ -5,5 +5,6 @@
     "livewire": "0.0.3",
     "sync": "~0.2.1",
     "mime": "~1.2.7"
-  }
+  },
+  "main":"lib/index.js"
 }
