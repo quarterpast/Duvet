@@ -1,4 +1,8 @@
 {
   "name": "Duvet",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "livewire": "0.0.3",
+    "sync": "~0.2.1"
+  }
 }
