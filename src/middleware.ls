@@ -1,5 +1,6 @@
 mime = require \mime
 path = require \path
+fs = require \fs
 
 with exports
 	@locals = (obj)->(res,last)->
