@@ -13,6 +13,8 @@ with exports
 		| \Function => obj ...
 		| otherwise => obj
 
-	@static-file = (file)->(res)->
-		res@headers.'content-type' = mime.lookup path.extname file
-		fs.create-read-stream file
+	@static = (file,)->
+		stat = fs.stat-sync file
+		(res)->
+			res@headers.'content-type' = mime.lookup path.extname file
+			fs.create-read-stream file
