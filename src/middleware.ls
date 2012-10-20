@@ -17,4 +17,5 @@ with exports
 		stat = fs.stat-sync file
 		(res)->
 			res@headers.'content-type' = mime.lookup path.extname file
+			res.status-code = 404 unless fs.exists.sync fs, file
 			fs.create-read-stream file
