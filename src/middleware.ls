@@ -1,5 +1,5 @@
 mime = require \mime
-path = require \path
+{extname,join,resolve,relative} = require \path
 fs = require \fs
 
 with exports
@@ -13,9 +13,13 @@ with exports
 		| \Function => obj ...
 		| otherwise => obj
 
-	@static = (file,)->
+	@static = (file)->
 		stat = fs.stat-sync file
 		(res)->
-			res@headers.'content-type' = mime.lookup path.extname file
-			res.status-code = 404 unless fs.exists.sync fs, file
-			fs.create-read-stream file
+			path = match stat
+			| (.is-directory) => join file, relative @route,@pathname
+			| otherwise => file
+
+			res@headers.'content-type' = mime.lookup extname path
+			res.status-code = 404 unless fs.exists.sync fs, path
+			fs.create-read-stream path
