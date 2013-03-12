@@ -6,7 +6,7 @@ module.exports = new class Renderer
 	engines: {}
 	render: (template)->
 		out = (res,last)~>
-			res@headers.'content-type' = 'text/html'
+			res{}headers.'content-type' = 'text/html'
 
 			content = @folder ? path.resolve require.main.filename,"../templates"
 			|> sync fs~readdir
@@ -19,9 +19,9 @@ module.exports = new class Renderer
 				|> sync fs~read-file
 				|> (.to-string \utf8)
 				|> @engines[tail path.extname that].compile
-				<| res@locals import body:last
+				<| res{}locals import body:last
 			else
 				res.status-code = 404
 				"Template #template not found."
 
-		if @base is template or @base!? then out else [out]+++@render @base
+		if @base is template or not @base? then out else [out] ++ @render @base

@@ -4,12 +4,12 @@ fs = require \fs
 
 with exports
 	@locals = (obj)->(res,last)->
-		res@locals import switch typeof! obj
+		res{}locals import switch typeof! obj
 		| \Function => obj ...
 		| otherwise => obj
 
 	@set = (obj)->(res,last)->
-		res@headers import switch typeof! obj
+		res{}headers import switch typeof! obj
 		| \Function => obj ...
 		| otherwise => obj
 
@@ -20,6 +20,6 @@ with exports
 			| (.is-directory) => join file, relative @route,@pathname
 			| otherwise => file
 
-			res@headers.'content-type' = mime.lookup extname path
+			res{}headers.'content-type' = mime.lookup extname path
 			res.status-code = 404 unless fs.exists.sync fs, path
 			fs.create-read-stream path
