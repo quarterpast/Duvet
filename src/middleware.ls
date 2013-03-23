@@ -2,18 +2,18 @@ mime = require \mime
 {extname,join,resolve,relative} = require \path
 fs = require \fs
 
-with exports
-	@locals = (obj)->(res,last)->
+export
+	locals: (obj)->(res,last)->
 		res{}locals import switch typeof! obj
 		| \Function => obj ...
 		| otherwise => obj
 
-	@set = (obj)->(res,last)->
+	set: (obj)->(res,last)->
 		res{}headers import switch typeof! obj
 		| \Function => obj ...
 		| otherwise => obj
 
-	@static = (file)->
+	static: (file)->
 		stat = fs.stat-sync file
 		(res)->
 			path = match stat
