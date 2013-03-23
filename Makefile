@@ -21,4 +21,3 @@ watch:
 
 .PHONY: test
 test: all
-	node_modules/.bin/lsc livewire.test.ls
