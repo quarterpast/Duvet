@@ -3,6 +3,7 @@ mime = require \mime
 fs = require \fs
 {sync} = require "./magic"
 zlib = require \zlib
+crypto = require \crypto
 
 export
 	locals: (obj)->(res,last)->
@@ -25,15 +26,23 @@ export
 			| otherwise => file
 
 			res{}headers.'content-type' = mime.lookup extname path
+			console.log path
 			if (sync exists) path
-				fs.create-read-stream path
+				pstat = (sync fs.stat) path
+				mod = @headers."if-modified-since"
+				if not mod? or new Date mod < pstat.mtime
+					res{}headers.'last-modified' = pstat.mtime.to-ISO-string!
+					fs.create-read-stream path
+				else
+					res.status-code = 304
+					"304 Not Modified"
 			else
 				res.status-code = 404
 				"404 #path"
 
 	gzip: (res,last)->
 		res{}headers.vary = "Accept-encoding"
-		if req.headers."Accept-encoding" == /gzip/
+		if @headers."accept-encoding" == /gzip/
 			res{}headers."content-encoding" = "gzip"
 			last.pipe zlib.create-gzip!
 		else last
