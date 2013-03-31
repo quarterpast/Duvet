@@ -15,11 +15,17 @@ export
 
 	static: (file)->
 		stat = fs.stat-sync file
+		exists = (file,cb)->
+			fs.exists file, cb null _
 		(res)->
+			console.log @route,@pathname
 			path = match stat
-			| (.is-directory) => join file, relative @route,@pathname
+			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
 
 			res{}headers.'content-type' = mime.lookup extname path
-			res.status-code = 404 unless fs.exists.sync fs, path
-			fs.create-read-stream path
+			if (magic.sync exists) path
+				fs.create-read-stream path
+			else
+				res.status-code = 404
+				"404 #path"
