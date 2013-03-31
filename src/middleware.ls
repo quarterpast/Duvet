@@ -12,9 +12,12 @@ export
 		| otherwise => obj
 
 	set: (obj)->(res,last)->
-		res{}headers import switch typeof! obj
+		headers = switch typeof! obj
 		| \Function => obj ...
 		| otherwise => obj
+
+		for header,val of headers
+			res.set-header header,val
 
 	static: (file)->
 		stat = fs.stat-sync file
@@ -25,13 +28,13 @@ export
 			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
 
-			res{}headers.'content-type' = mime.lookup extname path
+			res.set-header 'content-type' mime.lookup extname path
 			console.log path
 			if (sync exists) path
 				pstat = (sync fs.stat) path
 				mod = @headers."if-modified-since"
-				if not mod? or new Date mod < pstat.mtime
-					res{}headers.'last-modified' = pstat.mtime.to-ISO-string!
+				if not mod? or (new Date mod) < pstat.mtime
+					res.set-header 'last-modified' pstat.mtime.to-ISO-string!
 					fs.create-read-stream path
 				else
 					res.status-code = 304
@@ -41,8 +44,8 @@ export
 				"404 #path"
 
 	gzip: (res,last)->
-		res{}headers.vary = "Accept-encoding"
+		res.set-header \vary "Accept-encoding"
 		if @headers."accept-encoding" == /gzip/
-			res{}headers."content-encoding" = "gzip"
+			res.set-header "content-encoding" "gzip"
 			last.pipe zlib.create-gzip!
 		else last
