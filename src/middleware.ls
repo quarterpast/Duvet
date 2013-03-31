@@ -1,6 +1,7 @@
 mime = require \mime
 {extname,join,resolve,relative} = require \path
 fs = require \fs
+{sync} = require "./magic"
 
 export
 	locals: (obj)->(res,last)->
@@ -24,7 +25,7 @@ export
 			| otherwise => file
 
 			res{}headers.'content-type' = mime.lookup extname path
-			if (magic.sync exists) path
+			if (sync exists) path
 				fs.create-read-stream path
 			else
 				res.status-code = 404
