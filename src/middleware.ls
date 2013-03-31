@@ -2,6 +2,7 @@ mime = require \mime
 {extname,join,resolve,relative} = require \path
 fs = require \fs
 {sync} = require "./magic"
+zlib = require \zlib
 
 export
 	locals: (obj)->(res,last)->
@@ -19,7 +20,6 @@ export
 		exists = (file,cb)->
 			fs.exists file, cb null _
 		(res)->
-			console.log @route,@pathname
 			path = match stat
 			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
@@ -30,3 +30,10 @@ export
 			else
 				res.status-code = 404
 				"404 #path"
+
+	gzip: (res,last)->
+		res{}headers.vary = "Accept-encoding"
+		if req.headers."Accept-encoding" == /gzip/
+			res{}headers."content-encoding" = "gzip"
+			last.pipe zlib.create-gzip!
+		else last
