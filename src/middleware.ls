@@ -28,13 +28,13 @@ export
 			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
 
-			res.set-header 'content-type' mime.lookup extname path
+			res.set-header 'Content-Type' mime.lookup extname path
 			console.log path
 			if (sync exists) path
 				pstat = (sync fs.stat) path
 				mod = @headers."if-modified-since"
 				if not mod? or (new Date mod) < pstat.mtime
-					res.set-header 'last-modified' pstat.mtime.to-ISO-string!
+					res.set-header 'Last-Modified' pstat.mtime.to-ISO-string!
 					fs.create-read-stream path
 				else
 					res.status-code = 304
@@ -44,8 +44,8 @@ export
 				"404 #path"
 
 	gzip: (res,last)->
-		res.set-header \vary "Accept-encoding"
+		res.set-header \Vary "Accept-Encoding"
 		if @headers."accept-encoding" == /gzip/
-			res.set-header "content-encoding" "gzip"
+			res.set-header "Content-Encoding" "gzip"
 			last.pipe zlib.create-gzip!
 		else last
