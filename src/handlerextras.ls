@@ -1,5 +1,6 @@
 require! {
 	"livewire".HandlerContext
+	"./template"
 }
 
 HandlerContext ::=
@@ -8,4 +9,4 @@ HandlerContext ::=
 		| \Object   => @locals import obj
 		| \String   => @locals[obj] = val
 
-	
+	render: template~render
