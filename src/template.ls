@@ -8,7 +8,10 @@ module.exports = new class Renderer
 		content = @folder ? path.resolve require.main.filename,"../templates"
 		|> sync fs~readdir
 		|> filter (== //^#{template}//)
-		|> find path.extname>>tail>>(of this$.engines) #HAX
+		|> find compose do
+			path.extname
+			tail
+			~> it of @engines
 
 		if content?
 			rendered = @folder ? path.resolve require.main.filename,"../templates"
