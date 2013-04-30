@@ -17,22 +17,21 @@ export
 		stat = fs.stat-sync file
 		exists = (file,cb)->
 			fs.exists file, cb null _
+
 		->
 			path = match stat
 			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
+			type = mime.lookup extname path
 
-			res.set-header 'Content-Type' mime.lookup extname path
-			console.log path
 			if (sync exists) path
 				pstat = (sync fs.stat) path
-				mod = @headers."if-modified-since"
+				mod = @request.headers."if-modified-since"
 				if not mod? or (new Date mod) < pstat.mtime
-					res.set-header 'Last-Modified' pstat.mtime.to-ISO-string!
-					fs.create-read-stream path
+					headers:
+						'Last-Modified': pstat.mtime.to-ISO-string!
+						'Content-Type': type
+					body: fs.create-read-stream path
 				else
-					res.status-code = 304
-					"304 Not Modified"
-			else
-				res.status-code = 404
-				"404 #path"
+					status-code: 304 headers: 'Content-Type':type
+			else Error 404
