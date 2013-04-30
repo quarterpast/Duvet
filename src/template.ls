@@ -14,14 +14,17 @@ module.exports = new class Renderer
 			~> it of @engines
 
 		if content?
-			rendered = @folder ? path.resolve require.main.filename,"../templates"
+			compiled = @folder ? path.resolve require.main.filename,"../templates"
 			|> path.join _,that
 			|> sync fs~read-file
 			|> (.to-string \utf8)
 			|> @engines[tail path.extname that].compile
-			<| @locals import vars
 
-			headers: 'content-type':'text/html'
-			body: if @base is template or not @base? then out else @render @base, {...vars, body:out}
+			rendered = compiled @{}locals import vars
+
+			if @base is template or not @base?
+				headers: 'content-type':'text/html'
+				body: rendered
+			else @render @base, {...vars, body:rendered}
 
 		else Error 404
