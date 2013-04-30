@@ -4,7 +4,8 @@
   "dependencies": {
     "livewire": "0.3.x",
     "sync": "~0.2.1",
-    "mime": "~1.2.7"
+    "mime": "~1.2.7",
+    "buster-minimal": "0.0.0"
   },
-  "main":"lib/index.js"
+  "main": "lib/index.js"
 }
