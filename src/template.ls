@@ -1,27 +1,33 @@
-{sync} = require "./magic"
-fs = require \fs
-path = require \path
+require! {
+	livewire.magic
+	fs, path
+}
+
+{sync,async} = magic
 
 module.exports = new class Renderer
 	engines: {}
-	render: (template)->
-		out = (res,last)~>
-			res{}headers.'content-type' = 'text/html'
+	render: async (template,vars = {})->
+		content = @folder ? path.resolve require.main.filename,"../templates"
+		|> sync fs~readdir
+		|> filter (== //^#{template}//)
+		|> find compose do
+			path.extname
+			tail
+			~> it of @engines
 
-			content = @folder ? path.resolve require.main.filename,"../templates"
-			|> sync fs~readdir
-			|> filter (== //^#{template}//)
-			|> find path.extname>>tail>>(of this$.engines) #HAX
+		if content?
+			compiled = @folder ? path.resolve require.main.filename,"../templates"
+			|> path.join _,that
+			|> sync fs~read-file
+			|> (.to-string \utf8)
+			|> @engines[tail path.extname that].compile
 
-			if content?
-				@folder ? path.resolve require.main.filename,"../templates"
-				|> path.join _,that
-				|> sync fs~read-file
-				|> (.to-string \utf8)
-				|> @engines[tail path.extname that].compile
-				<| res{}locals import body:last
-			else
-				res.status-code = 404
-				"Template #template not found."
+			rendered = compiled @{}locals import vars
 
-		if @base is template or not @base? then out else [out] ++ @render @base
+			if @base is template or not @base?
+				headers: 'content-type':'text/html'
+				body: rendered
+			else @render @base, {...vars, body:rendered}
+
+		else Error 404

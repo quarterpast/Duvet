@@ -21,3 +21,4 @@ watch:
 
 .PHONY: test
 test: all
+	node_modules/.bin/lsc -d duvet.test.ls
