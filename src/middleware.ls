@@ -29,6 +29,7 @@ export
 				mod = @request.headers."if-modified-since"
 				if not mod? or (new Date mod) < pstat.mtime
 					headers:
+						'Cache-Control': "max-age=#{60s*60m*24h*30d}"
 						'Last-Modified': pstat.mtime.to-ISO-string!
 						'Content-Type': type
 					body: fs.create-read-stream path
