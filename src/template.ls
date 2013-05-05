@@ -1,10 +1,13 @@
-{sync} = require "./magic"
-fs = require \fs
-path = require \path
+require! {
+	livewire.magic
+	fs, path
+}
+
+{sync,async} = magic
 
 module.exports = new class Renderer
 	engines: {}
-	render: (template,vars = {})->
+	render: async (template,vars = {})->
 		content = @folder ? path.resolve require.main.filename,"../templates"
 		|> sync fs~readdir
 		|> filter (== //^#{template}//)

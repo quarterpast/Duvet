@@ -1,7 +1,7 @@
 mime = require \mime
 {extname,join,resolve,relative} = require \path
 fs = require \fs
-{sync} = require "./magic"
+require! livewire.magic.sync
 zlib = require \zlib
 crypto = require \crypto
 
@@ -33,5 +33,5 @@ export
 						'Content-Type': type
 					body: fs.create-read-stream path
 				else
-					status-code: 304 headers: 'Content-Type':type
+					body:"" status-code:304 headers: 'Content-Type':type
 			else Error 404
