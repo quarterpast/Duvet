@@ -1,32 +1,38 @@
 mime = require \mime
 {extname,join,resolve,relative} = require \path
 fs = require \fs
-{sync} = require "./magic"
+require! livewire.magic.sync
+zlib = require \zlib
+crypto = require \crypto
 
 export
-	locals: (obj)->(res,last)->
-		res{}locals import switch typeof! obj
-		| \Function => obj ...
-		| otherwise => obj
-
-	set: (obj)->(res,last)->
-		res{}headers import switch typeof! obj
-		| \Function => obj ...
-		| otherwise => obj
+	locals: (...args)->(last)->@locals ...args
+	set: (obj,val)->(last)->
+		headers: switch typeof! obj
+		| \Function => obj this
+		| \Object   => obj
+		| \String   => (obj): val
 
 	static: (file)->
 		stat = fs.stat-sync file
 		exists = (file,cb)->
 			fs.exists file, cb null _
-		(res)->
-			console.log @route,@pathname
+
+		->
 			path = match stat
 			| (.is-directory!) => join file, relative @route,@pathname
 			| otherwise => file
+			type = mime.lookup extname path
 
-			res{}headers.'content-type' = mime.lookup extname path
 			if (sync exists) path
-				fs.create-read-stream path
-			else
-				res.status-code = 404
-				"404 #path"
+				pstat = (sync fs.stat) path
+				mod = @request.headers."if-modified-since"
+				if not mod? or (new Date mod) < pstat.mtime
+					headers:
+						'Cache-Control': "max-age=#{60s*60m*24h*30d}"
+						'Last-Modified': pstat.mtime.to-ISO-string!
+						'Content-Type': type
+					body: fs.create-read-stream path
+				else
+					body:"" status-code:304 headers: 'Content-Type':type
+			else Error 404
