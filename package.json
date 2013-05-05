@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "dependencies": {
     "livewire": "0.3.x",
-    "mime": "~1.2.7",
+    "mime": "~1.2.7"
+  },
+  "devDependencies": {
     "buster-minimal": "0.0.0"
   },
   "main": "lib/index.js"
